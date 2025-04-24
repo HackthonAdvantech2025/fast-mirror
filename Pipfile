@@ -5,6 +5,13 @@ name = "pypi"
 
 [packages]
 fastapi = {extras = ["standard"], version = "*"}
+mjpeg-streamer = "*"
+torchvision = "*"
+torchaudio = "*"
+ultralytics = "*"
+numpy = "*"
+pillow = "*"
+opencv-python = "*"
 
 [dev-packages]
 
