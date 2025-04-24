@@ -1,0 +1,1 @@
+from .yolo.yolo_pose_app import YoloPoseApp

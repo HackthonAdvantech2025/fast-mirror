@@ -1,0 +1,47 @@
+# Python
+venv/
+.env
+*.env
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+*.log
+*.pot
+*.mo
+*.mypy_cache/
+*.pytest_cache/
+.cache/
+
+# FastAPI
+instance/
+*.db
+*.sqlite3
+
+# YOLO
+runs/
+weights/
+*.pt
+*.onnx
+*.engine
+*.tflite
+*.mlmodel
+*.pb
+*.cfg
+*.data
+*.yaml
+
+# VSCode
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+__pycache__/
+
+focus/focus_sweep_images
