@@ -56,6 +56,13 @@ class YoloPoseApp:
         self.read_thread.start()
         self.preprocess_thread.start()
 
+    def set_clothes_path(self, clothes_path):
+        """
+        動態更換衣服圖檔
+        """
+        self.clothes_img = Image.open(clothes_path).convert("RGBA")
+        print(f"[YoloPoseApp] 已更換衣服圖：{clothes_path}")
+
     def _inference_worker(self):
         while not self.stop_event.is_set():
             try:
@@ -220,14 +227,23 @@ class YoloPoseApp:
         # cv2.imwrite(path, frame)
         self.stream.set_frame(frame)
 
-if __name__ == "__main__":
-    # 建立主應用物件，指定模型、衣服圖、攝影機等參數
-    app = YoloPoseApp(
-        model_path="yolo11m-pose.pt",
-        clothes_path="tshirt1.png",
+def create_yolo_app(clothes_path=None):
+    """
+    建立新的 YoloPoseApp 實例，可指定衣服圖路徑
+    """
+    import os
+    if clothes_path is None:
+        clothes_path = os.path.expanduser("~/fast_mirror/yolo/tshirt1.png")
+    return YoloPoseApp(
+        model_path=os.path.expanduser("~/fast_mirror/yolo/yolo11m-pose.pt"),
+        clothes_path=clothes_path,
         camera_index=10,
         stream_size=(1080, 1920),
         stream_quality=75,
         stream_fps=30
     )
+
+if __name__ == "__main__":
+    # 建立主應用物件，指定模型、衣服圖、攝影機等參數
+    app = create_yolo_app()
     app.run()
