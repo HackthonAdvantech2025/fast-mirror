@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Body
 from tools import parse_starlette_request
 from yolo.yolo_pose_app import create_yolo_app
 import os
+from reopsitory.mirror_repo import get_product_info
 
 router = APIRouter(
     prefix=f'',
@@ -26,8 +27,13 @@ async def set_clothes_path(request: Request, data: dict = Body(...)):
     yolo_app.set_clothes_path(clothes_path)
     return {"success": True, "msg": f"已更換衣服圖為 {clothes_path}"}
 
+@router.get("/product")
+async def product(request: Request):
+    return get_product_info()
+    
+
 @router.get("/change")
-async def action(request: Request,):
+async def action(request: Request, action: str):
     print(await parse_starlette_request(request))
 
     return 

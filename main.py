@@ -3,6 +3,7 @@ from uvicorn import run
 from router.mirror_router import router as mirror_router
 from yolo.yolo_pose_app import YoloPoseApp
 import os
+from db.create_db import create_db
 
 def creat_app() -> FastAPI:
     application = FastAPI(
@@ -26,6 +27,7 @@ def on_startup():
         stream_quality=75,
         stream_fps=30
     )
+    create_db()
 
 app.add_event_handler("startup", on_startup)
 
