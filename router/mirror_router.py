@@ -3,6 +3,7 @@ from tools import parse_starlette_request
 from yolo.yolo_pose_app import create_yolo_app
 import os
 from reopsitory.mirror_repo import get_product_info
+from gptproxy import chat_handler
 
 router = APIRouter(
     prefix=f'',
@@ -46,6 +47,8 @@ async def dress(request: Request, product_id: str):
 async def dress(request: Request, product_id: str):
     pass
 
-@router.get("/chat")
-async def chat(messages: str):
-    pass
+@router.post("/chat")
+async def chat(request: Request, message: str = Body(...)):
+    message = await request.json()
+    response = await chat_handler(message)
+    return response

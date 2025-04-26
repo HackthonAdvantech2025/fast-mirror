@@ -5,7 +5,7 @@ from yolo.yolo_pose_app import YoloPoseApp
 import os
 from db.create_db import create_db
 
-def creat_app() -> FastAPI:
+def create_app() -> FastAPI:
     application = FastAPI(
         title="Fast Mirror",
         description="Miró is fast",
@@ -15,7 +15,7 @@ def creat_app() -> FastAPI:
     
     return application
 
-app = creat_app()
+app = create_app()
 
 # 啟動時初始化 YoloPoseApp 並存到 app.state
 def on_startup():
