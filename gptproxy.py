@@ -3,6 +3,11 @@ import httpx
 from fastapi import HTTPException
 from dotenv import load_dotenv
 
+import boto3
+import json
+from botocore.config import Config
+from model.mirror_model import MessageContent
+from typing import List
 
 async def chat_handler(message: str):
     load_dotenv()
@@ -45,3 +50,48 @@ async def chat_handler(message: str):
     except (KeyError, IndexError):
         raise HTTPException(status_code=500, detail="GPT response format error")
     return result
+
+async def chat_with_nova(message_log: List[MessageContent]):
+    try:
+        bedrock_runtime = boto3.client(
+            service_name="bedrock-runtime",
+            region_name="us-west-2",
+            config=Config(connect_timeout=5, read_timeout=60)
+        )
+        formatted_messages = []
+        for msg in message_log:
+            formatted_messages.append({
+                "role": msg.role,
+                "content": [{"text": item.text} for item in msg.content] # 假設 MessageContent 的 content 是一個包含 text 屬性的物件列表
+            })
+
+        response = bedrock_runtime.converse(
+            modelId="anthropic.claude-3-sonnet-20240229-v1:0",
+            messages=formatted_messages,
+            inferenceConfig={
+                "maxTokens": 512,
+                "temperature": 0.5,
+                "topP": 0.9,
+                "stopSequences": []
+            }
+        )
+        print(f"response: {json.dumps(response, indent=2)}")
+        return {"response": response['output']['message']['content']}
+    except Exception as e:
+        print(f"Error in chat_with_nova: {e}, lineNo. {e.__traceback__.tb_lineno}")
+        return {"error": str(e)}
+
+async def main():
+    # 測試 chat_with_nova 函數
+    message_log = [
+        MessageContent(role="user", content=[{"text": "Hello, how are you?"}]),
+        MessageContent(role="assistant", content=[{"text": "I'm fine, thank you!"}]),
+        MessageContent(role="user", content=[{"text": "What can you do?"}]),
+    ]
+    response = await chat_with_nova(message_log)
+    print(response)
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())

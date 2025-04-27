@@ -1,35 +1,34 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi_mcp import FastApiMCP
 from uvicorn import run
 from router.mirror_router import router as mirror_router
-from yolo.yolo_pose_app import YoloPoseApp
+# from yolo.yolo_pose_app import YoloPoseApp
 import os
-from db.create_db import create_db
 
 def create_app() -> FastAPI:
     application = FastAPI(
         title="Fast Mirror",
         description="Miró is fast",
     )
-    
+    global current_clothe
+    global current_pants
     application.include_router(mirror_router)
+    
+    # CORS 設定
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # 或指定你的前端網址，如 ["http://localhost:3000"]
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     
     return application
 
 app = create_app()
-
-# 啟動時初始化 YoloPoseApp 並存到 app.state
-def on_startup():
-    app.state.yolo_app = YoloPoseApp(
-        model_path=os.path.expanduser("~/fast_mirror/yolo/yolo11m-pose.pt"),
-        clothes_path=os.path.expanduser("~/fast_mirror/yolo/tshirt1.png"),
-        camera_index=10,
-        stream_size=(1080, 1920),
-        stream_quality=75,
-        stream_fps=30
-    )
-    create_db()
-
-app.add_event_handler("startup", on_startup)
+mcp = FastApiMCP(app)
+mcp.mount()
 
 if __name__ == "__main__":
     run('main:app', host="0.0.0.0", port=8000, reload=True)
